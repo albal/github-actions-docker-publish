@@ -91,6 +91,7 @@ runs:
           DOCKERFILE=""
         else
           DOCKERFILE="-f ${{ inputs.dockerfile }}"
+        fi
 
         IMAGE_NAME="$ORG_NAME/$REPO_NAME"
 
