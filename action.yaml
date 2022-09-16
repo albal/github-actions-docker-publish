@@ -1,6 +1,6 @@
 # action.yml
 name: 'Docker Build Tag Publish'
-author: Bitovi
+author: albal
 description: 'Build, Tag, and Publish a docker image'
 branding: 
   icon: tag
@@ -36,6 +36,9 @@ inputs:
   docker_password:
     description: Docker password
     required: true
+  dockerfile:
+    description: Docekrfile location
+    required: false
 
 runs:
   using: "composite"
@@ -78,17 +81,22 @@ runs:
           ORG_NAME="${{ inputs.org_name }}"
         fi
 
-         if [ -z "${{ inputs.repo_name }}" ] ; then
+        if [ -z "${{ inputs.repo_name }}" ] ; then
           REPO_NAME=$(echo $GITHUB_REPOSITORY | sed 's/^.*\///')
         else
           REPO_NAME="${{ inputs.repo_name }}"
         fi
+        
+        if [ -z "${{ inputs.dockerfile }}" ] ; then
+          DOCKERFILE=""
+        else
+          DOCKERFILE="-f ${{ inputs.dockerfile }}"
 
         IMAGE_NAME="$ORG_NAME/$REPO_NAME"
 
         echo "::group::Build Image"
         echo "Building $IMAGE_NAME"
-        docker build --pull -t $IMAGE_NAME:$IMAGE_TAG -f Contentful/Dockerfile .
+        docker build --pull -t $IMAGE_NAME:$IMAGE_TAG $DOCKERFILE .
         echo "::endgroup::"
 
         echo "::group::Push Image"
